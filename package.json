@@ -1,0 +1,22 @@
+{
+  "name": "tickitz-api",
+  "version": "1.0.0",
+  "description": "Tickitz-API",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon -r dotenv/config app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "ZetG",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.1",
+    "express": "^4.18.2",
+    "nodemon": "^3.0.3",
+    "pg": "^8.11.3"
+  },
+  "devDependencies": {
+    "eslint": "^8.56.0"
+  }
+}
