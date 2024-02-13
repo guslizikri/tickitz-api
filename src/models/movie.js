@@ -2,7 +2,7 @@ const db = require('../config/db');
 const model = {
     getMovie : () => {
         return new Promise((resolve, reject) => {
-            db.query('select * from movie')
+            db.query('select * from movie limit 5 offset 3')
             .then((res)=>{
                 resolve(res.rows);
             }).catch((err)=>{
@@ -12,7 +12,7 @@ const model = {
     },
     getMovieByName : (name) => {
         return new Promise((resolve, reject) => {
-            db.query(`select * from movie where title like $1`, [`%${name}%`])
+            db.query(`select * from movie where title like $1 limit 5`, [`%${name}%`])
             .then((res)=>{
                 resolve(res.rows);
             }).catch((err)=>{
@@ -22,7 +22,7 @@ const model = {
     },
     getMovieByNameAndDate : (name, release_date) => {
         return new Promise((resolve, reject) => {
-            db.query(`select * from movie where title like $1 or extract(year from release_date) = $2 `, [`%${name}%`, release_date])
+            db.query(`select * from movie where title like $1 or extract(year from release_date) = $2 limit 5`, [`%${name}%`, release_date])
             .then((res)=>{
                 resolve(res.rows);
             }).catch((err)=>{

@@ -2,7 +2,7 @@ const db = require('../config/db');
 const model = {
     getBooking : () => {
         return new Promise((resolve, reject) => {
-            db.query('select * from booking')
+            db.query('select * from booking limit 5')
             .then((res)=>{
                 resolve(res.rows);
             }).catch((err)=>{
@@ -24,7 +24,7 @@ const model = {
     updateBooking : (payment_method, id) => {
         return new Promise((resolve, reject) => {
             console.log(id);
-            db.query(`update booking set payment_method = $1, updated_at = now() where id = $2`, [payment_method, id] )
+            db.query(`update booking set payment_method = coalesce($1, payment_method), updated_at = now() where id = $2`, [payment_method, id] )
             .then((res)=>{
                 resolve(res.rowCount);
             }).catch((err)=>{

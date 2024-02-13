@@ -2,7 +2,7 @@ const db = require('../config/db');
 const model = {
     getSchedule : () => {
         return new Promise((resolve, reject) => {
-            db.query('select * from schedule')
+            db.query('select * from schedule limit 5')
             .then((res)=>{
                 resolve(res.rows);
             }).catch((err)=>{
@@ -21,10 +21,10 @@ const model = {
             });
         });
     },
-    updateSchedule : (title, id) => {
+    updateSchedule : (location, id) => {
         return new Promise((resolve, reject) => {
             console.log(id);
-            db.query(`update schedule set location = $1, updated_at = now() where id = $2`, [title, id] )
+            db.query(`update schedule set location = coalesce($1, location), updated_at = now() where id = $2`, [location, id] )
             .then((res)=>{
                 resolve(res.rowCount);
             }).catch((err)=>{
