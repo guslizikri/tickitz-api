@@ -8,21 +8,21 @@ const controller = {
             // get movie by name and release dat
             if (title && release_date) {
                 const data = await model.getMovieByNameAndDate(title, release_date);
-                response(res, 200, data);
+                return response(res, 200, data);
             // get movie by name
             }else if(title){
                 const data = await model.getMovieByName(title);
-                response(res, 200, data);
+                return response(res, 200, data);
             }else if (Object.keys(req.query).length === 0) {
                 const data = await model.getMovie();
-                response(res, 200, data);
+                return response(res, 200, data);
             } else {
-                response(res, 404, "Not Found");
+                return response(res, 404, "Not Found");
             }
             
             // res.send(data)
         } catch (error) {
-            response(res, 500, error.message);
+            return response(res, 500, error.message);
         }
     },
     
@@ -30,9 +30,9 @@ const controller = {
         try {
             const {title, director, casts, synopsis, duration, img, release_date} = req.body;
             const data = await model.addMovie(title, director, casts, synopsis, duration, img, release_date);
-            response(res, 200, data);
+            return response(res, 201, data);
         } catch (error) {
-            response(res, 500, error.message);
+            return response(res, 500, error.message);
         }
     },
     updateMovie : async (req, res) => {
@@ -40,9 +40,9 @@ const controller = {
             const {title} = req.body;
             const id = req.params.id;
             const data = await model.updateMovie(title, id);
-            response(res, 200, data);
+            return response(res, 200, data);
         } catch (error) {
-            response(res, 500, error.message);
+            return response(res, 500, error.message);
         }
     },
     
@@ -51,9 +51,9 @@ const controller = {
         try {
             const id = req.params.id;
             const data = await model.deleteMovie(id);
-            response(res, 200, data);
+            return response(res, 200, data);
         } catch (error) {
-            response(res, 500, error.message);
+            return response(res, 500, error.message);
         }
     }
 };

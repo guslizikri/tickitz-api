@@ -3,9 +3,13 @@ const routers = express.Router();
 const movieRoutes = require('./movie');
 const scheduleRoutes = require('./schedule');
 const bookingRoutes = require('./booking');
+const userRoutes = require('./user');
+const authRoutes = require('./auth');
 
 routers.use("/movie", movieRoutes);
 routers.use("/schedule", scheduleRoutes);
 routers.use("/booking", bookingRoutes);
+routers.use("/user", userRoutes);
+routers.use("/auth", authRoutes);
 
 module.exports = routers;
