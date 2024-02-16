@@ -1,12 +1,13 @@
 const model = require('../models/schedule');
+const response = require('../utils/response');
 
 const controller = {
     getSchedule : async (req, res) => {
         try {
             const data = await model.getSchedule();
-            res.status(200).json(data);
+            response(res, 200, data);
         } catch (error) {
-            res.status(500).json(error);
+            response(res, 500, error.message);
         }
     },
 
@@ -15,9 +16,9 @@ const controller = {
             const {movie_id, location, price, start_date, end_date, time} = req.body;
             console.log(req.body);
             const data = await model.addSchedule(movie_id, location, price, start_date, end_date, time);
-            res.status(200).json(data);
+            response(res, 200, data);
         } catch (error) {
-            res.status(500).json(error);
+            response(res, 500, error.message);
         }
     },
     updateSchedule : async (req, res) => {
@@ -25,18 +26,18 @@ const controller = {
             const {location} = req.body;
             const id = req.params.id;
             const data = await model.updateSchedule(location, id);
-            res.status(200).json(data);
+            response(res, 200, data);
         } catch (error) {
-            res.status(500).json(error);
+            response(res, 500, error.message);
         }
     },
     deleteSchedule : async (req, res) => {
         try {
             const id = req.params.id;
             const data = await model.deleteSchedule(id);
-            res.status(200).json(data);
+            response(res, 200, data);
         } catch (error) {
-            res.status(500).json(error);
+            response(res, 500, error.message);
         }
     }
 };

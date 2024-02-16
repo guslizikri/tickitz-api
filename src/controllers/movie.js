@@ -1,4 +1,5 @@
 const model = require('../models/movie');
+const response = require('../utils/response');
 
 const controller = {
     getMovie : async (req, res) => {
@@ -7,21 +8,21 @@ const controller = {
             // get movie by name and release dat
             if (title && release_date) {
                 const data = await model.getMovieByNameAndDate(title, release_date);
-                res.status(200).json(data);
+                response(res, 200, data);
             // get movie by name
             }else if(title){
                 const data = await model.getMovieByName(title);
-                res.status(200).json(data);
+                response(res, 200, data);
             }else if (Object.keys(req.query).length === 0) {
                 const data = await model.getMovie();
-                res.status(200).json(data);
+                response(res, 200, data);
             } else {
-                res.status(404).send("Not Found");
+                response(res, 404, "Not Found");
             }
             
             // res.send(data)
         } catch (error) {
-            res.status(500).json(error);
+            response(res, 500, error.message);
         }
     },
     
@@ -29,9 +30,9 @@ const controller = {
         try {
             const {title, director, casts, synopsis, duration, img, release_date} = req.body;
             const data = await model.addMovie(title, director, casts, synopsis, duration, img, release_date);
-            res.status(200).json(data);
+            response(res, 200, data);
         } catch (error) {
-            res.status(500).json(error);
+            response(res, 500, error.message);
         }
     },
     updateMovie : async (req, res) => {
@@ -39,9 +40,9 @@ const controller = {
             const {title} = req.body;
             const id = req.params.id;
             const data = await model.updateMovie(title, id);
-            res.status(200).json(data);
+            response(res, 200, data);
         } catch (error) {
-            res.status(500).json(error);
+            response(res, 500, error.message);
         }
     },
     
@@ -50,9 +51,9 @@ const controller = {
         try {
             const id = req.params.id;
             const data = await model.deleteMovie(id);
-            res.status(200).json(data);
+            response(res, 200, data);
         } catch (error) {
-            res.status(500).json(error);
+            response(res, 500, error.message);
         }
     }
 };

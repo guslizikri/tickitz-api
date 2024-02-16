@@ -4,7 +4,11 @@ const model = {
         return new Promise((resolve, reject) => {
             db.query('select * from schedule limit 5')
             .then((res)=>{
-                resolve(res.rows);
+                let result = res.rows;
+                if (res.rows <= 0) {
+                    result = "Data not Found";
+                }
+                resolve(result);
             }).catch((err)=>{
                 reject(err);
             });
@@ -15,7 +19,7 @@ const model = {
             db.query(`insert into schedule (movie_id, location, price, start_date, end_date, time) 
             values($1, $2, $3, $4, $5, $6)`, [movie_id, location, price, start_date, end_date, time])
             .then((res)=>{
-                resolve(res.rowCount);
+                resolve(`${res.rowCount} data created`);
             }).catch((err)=>{
                 reject(err);
             });
@@ -26,7 +30,7 @@ const model = {
             console.log(id);
             db.query(`update schedule set location = coalesce($1, location), updated_at = now() where id = $2`, [location, id] )
             .then((res)=>{
-                resolve(res.rowCount);
+                resolve(`${res.rowCount} data updated`);
             }).catch((err)=>{
                 reject(err);
             });
@@ -36,7 +40,7 @@ const model = {
         return new Promise((resolve, reject) => {
             db.query(`delete from schedule where id = $1`, [id])
             .then((res)=>{
-                resolve(res.rowCount);
+                resolve(`${res.rowCount} data deleted`);
             }).catch((err)=>{
                 reject(err);
             });

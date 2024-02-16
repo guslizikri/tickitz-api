@@ -1,12 +1,13 @@
 const model = require('../models/booking');
+const response = require('../utils/response');
 
 const controller = {
     getBooking : async (req, res) => {
         try {
             const data = await model.getBooking();
-            res.status(200).json(data);
+            response(res, 200, data);
         } catch (error) {
-            res.status(500).json(error);
+            response(res, 500, error.message);
         }
     },
     addBooking : async (req, res) => {
@@ -14,9 +15,9 @@ const controller = {
             const {schedule_id, user_id, seat, total_ticket, total_payment, payment_method} = req.body;
             console.log(req.body);
             const data = await model.addBooking(schedule_id, user_id, seat, total_ticket, total_payment, payment_method);
-            res.status(200).json(data);
+            response(res, 200, data);
         } catch (error) {
-            res.status(500).json(error);
+            response(res, 500, error.message);
         }
     },
     updateBooking : async (req, res) => {
@@ -24,9 +25,9 @@ const controller = {
             const {payment_method} = req.body;
             const id = req.params.id;
             const data = await model.updateBooking(payment_method, id);
-            res.status(200).json(data);
+            response(res, 200, data);
         } catch (error) {
-            res.status(500).json(error);
+            response(res, 500, error.message);
         }
     },
     
@@ -34,9 +35,9 @@ const controller = {
         try {
             const id = req.params.id;
             const data = await model.deleteBooking(id);
-            res.status(200).json(data);
+            response(res, 200, data);
         } catch (error) {
-            res.status(500).json(error);
+            response(res, 500, error.message);
         }
     }
 };
