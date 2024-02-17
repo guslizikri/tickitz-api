@@ -75,6 +75,39 @@ const model = {
             });
         });
     },
+    save : async ({ name, banner, release, genre }) => {
+        const pg = await db.connect();
+        try {
+            await pg.query('BEGIN');
+    
+            const movie = await pg.query(
+                `INSERT INTO public.movie
+                    (movie_name, movie_banner, release_date)
+                VALUES($1, $2, $3) RETURNING movie_id`,
+                [name, banner, release]
+            );
+    
+            if (genre && genre.length > 0) {
+                for await (const v of genre) {
+                    await pg.query(
+                        `
+                        INSERT INTO public.movie_genre
+                            (movie_id, genre_id)
+                        VALUES($1, $2)`,
+                        [movie.rows[0].movie_id, v]
+                    );
+                }
+            }
+    
+            await pg.query('COMMIT');
+            return `${movie.rowCount} data movie created`;
+        } catch (error) {
+            console.log(error);
+            await pg.query('ROLLBACK');
+            throw error;
+        }
+    }
+    
 };
 
 module.exports = model;

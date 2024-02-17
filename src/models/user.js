@@ -16,7 +16,19 @@ const model = {
                 });
         });
     },
-    
+    // mengambil seluruh data user berdasarkan username
+    getByUsername : (username) => {
+        return new Promise((resolve, reject) => {
+            db.query('SELECT * FROM users WHERE username = $1', [username])
+                .then((res) => {
+                    resolve(res.rows);
+                })
+                .catch((error) => {
+                    reject(error);
+                });
+        });
+    },
+    // mengambil data user untuk kebutuhan login berdasarkan username
     getPassByUsername : (username) => {
         return new Promise((resolve, reject) => {
             db.query('SELECT id, password, role FROM users WHERE username = $1', [username])
@@ -32,7 +44,7 @@ const model = {
                 });
         });
     },
-    
+    // Cek data apakah ada atau tidak didalam table user
     dataExists : (username) => {
         return new Promise((resolve, reject) => {
             db.query('SELECT id FROM users WHERE username = $1', [username])
@@ -49,18 +61,7 @@ const model = {
         });
     },
     
-    getByUsername : (username) => {
-        return new Promise((resolve, reject) => {
-            db.query('SELECT id, fullname, username, email, role FROM users WHERE username = $1', [username])
-                .then((res) => {
-                    resolve(res.rows);
-                })
-                .catch((error) => {
-                    reject(error);
-                });
-        });
-    },
-    
+    // menambahkan user untuk kebutuhan register
     addUser : ({ username, password, email }) => {
         return new Promise((resolve, reject) => {
             db.query(
@@ -79,17 +80,24 @@ const model = {
         });
     },
     
-    updateUser : ({ username, password, email, userId }) => {
+    // update user 
+
+    updateUser : ({ username, password, email, role}, id) => {
+        console.log(username);
+        console.log(password);
+        console.log(email);
+        console.log(role);
+        console.log(id);
         return new Promise((resolve, reject) => {
             db.query(
                 `UPDATE users SET
                     username = COALESCE(NULLIF($1, ''), username),
                     password = COALESCE(NULLIF($2, ''), password),
                     email = COALESCE(NULLIF($3, ''), email),
+                    role = COALESCE(NULLIF($4, ''), role),
                     updated_at = now()
-                WHERE username = $4           
-            `,
-                [username, password, email, userId]
+                WHERE id = $5`,
+                [username, password, email, role, id]
             )
                 .then((res) => {
                     resolve(`${res.rowCount} user updated`);
@@ -100,6 +108,7 @@ const model = {
         });
     },
     
+    //hapus user
     deleteUser : (username) => {
         return new Promise((resolve, reject) => {
             db.query(`DELETE FROM users WHERE username = $1`, [username])

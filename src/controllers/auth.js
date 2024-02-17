@@ -5,9 +5,10 @@ const jwt = require('jsonwebtoken');
 
 // tidak mempunyai model karena akan memakai model user
 
-const genToken = (data) =>{
+const genToken = (id, role) =>{
     const payload = {
-        role: data
+        id: id,
+        role: role
     };
     const token = jwt.sign(payload, process.env.JWT_KEY, {expiresIn: '1h'});
     return token;
@@ -22,7 +23,7 @@ const controller = {
             const passwordUser = req.body.password;
             const check = await bcrypt.compare(passwordUser, password);
             if(check){
-                const  tokenJwt = genToken(role);
+                const  tokenJwt = genToken(id, role);
                 return response(res, 200, {message: "Login Succesful", id: id, token: tokenJwt});
             }else{
                 return response(res, 401, "Incorrect Password");

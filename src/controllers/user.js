@@ -5,7 +5,7 @@ const hashing = require('../utils/hash');
 const controller = {
     getUser : async (req, res) => {
         try {
-            const result = await model.getByUsername(req.user);
+            const result = await model.getUser();
             return response(res, 200, result);
         } catch (error) {
             return response(res, 500, error.message);
@@ -17,16 +17,18 @@ const controller = {
         try {
             req.body.password = await hashing(req.body.password);
             console.log(req.body);
-            const result = await model.addUser(req.body);
+            // const result = await model.addUser(req.body);
             return response(res, 201, result);
         } catch (error) {
             return response(res, 500, error.message);
         }
     },
     
-    update : async (req, res) => {
+    updateUser : async (req, res) => {
         try {
-            const result = await model.updateData(req.user);
+            console.log(req.body);
+            console.log(req.params.id);
+            const result = await model.updateUser(req.body, req.params.id);
             return response(res, 200, result);
         } catch (error) {
             return response(res, 500, error.message);
