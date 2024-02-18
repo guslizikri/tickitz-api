@@ -10,7 +10,7 @@ const genToken = (id, role) =>{
         id: id,
         role: role
     };
-    const token = jwt.sign(payload, process.env.JWT_KEY, {expiresIn: '1h'});
+    const token = jwt.sign(payload, process.env.JWT_KEY, {expiresIn: '1d'});
     return token;
 };
 const controller = {

@@ -1,5 +1,7 @@
 const multer  = require('multer');
 const response = require('../utils/response');
+const path = require('path');
+const { error } = require('console');
 
 const middleware = {
     uploadMovie : (req, res, next) => {
@@ -14,14 +16,34 @@ const middleware = {
               cb(null, file.fieldname + '-' + uniqueSuffix+ '-' + file.originalname );
             }
         });
-        const upload = multer({ storage: storage }).single("image");
+        const imageFilter = (req, file, cb) => {
+            const allowedExtentions =['.jpeg', '.jpg', '.png'];
+            const extName = path.extname(file.originalname).toLowerCase();
+            console.log(extName);
+            const exactExt = allowedExtentions.includes(extName);
+            console.log(exactExt);
+            if (exactExt) {
+              return cb(null, true);
+            } 
+            const error = new Error("invalid file extention. Only PNG, JPG, and JPEG files are allowed");
+            return cb(error, false);
+        };
+        const upload = multer({ 
+          storage: storage, 
+          fileFilter: imageFilter,
+          limits: {
+            fileSize: 5 * 1024 * 1024 // Batas ukuran file (contoh: 5 MB)
+          }
+        }).single("image");
         upload(req, res,  (err) =>  {
             if (err instanceof multer.MulterError) {
               // A Multer error occurred when uploading.
+              console.log('m');
               return response(res,500, err);
 
             } else if (err) {
               // An unknown error occurred when uploading.
+              console.log('a');
               return response(res, 500, err);
 
             }

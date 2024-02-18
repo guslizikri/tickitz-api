@@ -1,5 +1,6 @@
 const model = require('../models/movie');
 const response = require('../utils/response');
+const fs = require('fs');
 
 const controller = {
     getMovie : async (req, res) => {
@@ -28,8 +29,11 @@ const controller = {
     
     addMovie : async (req, res) => {
         try {
-            const {title, director, casts, synopsis, duration, img, release_date} = req.body;
-            const data = await model.addMovie(title, director, casts, synopsis, duration, img, release_date);
+            
+            console.log(req.body);
+            console.log(req.file);
+            req.body.img = `http://localhost:3001/movie/image/${req.file.filename}`;
+            const data = await model.addMovie(req.body);
             return response(res, 201, data);
         } catch (error) {
             return response(res, 500, error.message);
@@ -37,9 +41,20 @@ const controller = {
     },
     updateMovie : async (req, res) => {
         try {
-            const {title} = req.body;
             const id = req.params.id;
-            const data = await model.updateMovie(title, id);
+            const dataExist = await model.getMovieById(id);
+            if (dataExist === false) {
+                return response(res, 404, "Data not found");
+            }
+            
+            console.log(req.file);
+            req.body.img = await req.file? `http://localhost:3001/movie/image/${req.file.filename}` : "";
+            if (req.body.img) {
+                const imgName = dataExist[0].img.replace("http://localhost:3001/movie/image/", "");
+                const path = `./public/upload/movie/${imgName}`;
+                fs.unlinkSync(path);
+            }
+            const data = await model.updateMovie(req.body, id);
             return response(res, 200, data);
         } catch (error) {
             return response(res, 500, error.message);
@@ -50,8 +65,17 @@ const controller = {
     deleteMovie : async (req, res) => {
         try {
             const id = req.params.id;
+            const dataExist = await model.getMovieById(id);
+            if (dataExist === false) {
+                return response(res, 404, "Data not found");
+            }
+            const imgName = dataExist[0].img.replace("http://localhost:3001/movie/image/", "");
+            const path = `./public/upload/movie/${imgName}`;
+            fs.unlinkSync(path, (error) => {
+                throw error;
+            });
             const data = await model.deleteMovie(id);
-            return response(res, 200, data);
+            return response(res, 200, dataExist);
         } catch (error) {
             return response(res, 500, error.message);
         }

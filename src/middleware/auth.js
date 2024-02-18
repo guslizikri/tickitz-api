@@ -8,14 +8,11 @@ const middleware = {
         if (!authorization) {
             return response(res, 401, "Access denied. Log in to continue");
         }
-        console.log(authorization);
         const token = authorization.replace("Bearer ", "");
-        console.log(token);
         jwt.verify(token,process.env.JWT_KEY, (error, decode) =>{
             if (error) {
                 return response(res, 401, error);
             }
-            console.log(decode);
             req.decodeToken = decode;
             next();
         });
@@ -30,7 +27,6 @@ const middleware = {
     },
     isUser : (req, res, next) => {
         role = req.decodeToken.role.toLowerCase();
-        console.log(role);
         if (role !== 'user') {
             return response(res, 401, "Invalid Role");
         }

@@ -2,8 +2,9 @@ const db = require('../config/db');
 const model = {
     getMovie : () => {
         return new Promise((resolve, reject) => {
-            db.query('select * from movie limit 5 offset 3')
+            const img = db.query('select * from movie order by created_at desc limit 5')
             .then((res)=>{
+                console.log(img);
                 let result = res.rows;
                 if (result <= 0) {
                     result = "Data not found";
@@ -28,6 +29,20 @@ const model = {
             });
         });
     },
+    getMovieById : (id) => {
+        return new Promise((resolve, reject) => {
+            db.query(`select * from movie where id = $1`, [id])
+            .then((res)=>{
+                let result = res.rows;
+                if (result <= 0) {
+                    result = false;
+                }
+                resolve(result);
+            }).catch((err)=>{
+                reject(err);
+            });
+        });
+    },
     getMovieByNameAndDate : (name, release_date) => {
         return new Promise((resolve, reject) => {
             db.query(`select * from movie where title like $1 or extract(year from release_date) = $2 limit 5`, [`%${name}%`, release_date])
@@ -42,7 +57,7 @@ const model = {
             });
         });
     },
-    addMovie : (title, director, casts, synopsis, duration, img, release_date) => {
+    addMovie : ({title, director, casts, synopsis, duration, img, release_date}) => {
         return new Promise((resolve, reject) => {
             db.query(`insert into movie (title, director, casts, synopsis, duration, img, release_date) 
             values($1, $2, $3, $4, $5, $6, $7)`, [title, director, casts, synopsis, duration, img, release_date])
@@ -53,10 +68,19 @@ const model = {
             });
         });
     },
-    updateMovie : (title, id) => {
+    updateMovie : ({title, director, casts, synopsis, duration, img, release_date}, id) => {
         return new Promise((resolve, reject) => {
-            console.log(id);
-            db.query(`update movie set title = coalesce($1, title), updated_at = now() where id = $2`, [title, id] )
+            db.query(
+                `update movie set 
+                    title = COALESCE(NULLIF($1, ''), title),
+                    director = COALESCE(NULLIF($2, ''), director),
+                    casts = COALESCE(NULLIF($3, ''), casts),
+                    synopsis = COALESCE(NULLIF($4, ''), synopsis),
+                    duration = $5,
+                    img = COALESCE(NULLIF($6, ''), img),
+                    release_date = $7,
+                    updated_at = now() 
+                where id = $8`, [title, director, casts, synopsis, duration, img, release_date, id] )
             .then((res)=>{
                 resolve(`${res.rowCount} data updated`);
             }).catch((err)=>{

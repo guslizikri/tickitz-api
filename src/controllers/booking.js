@@ -22,9 +22,8 @@ const controller = {
     },
     updateBooking : async (req, res) => {
         try {
-            const {payment_method} = req.body;
             const id = req.params.id;
-            const data = await model.updateBooking(payment_method, id);
+            const data = await model.updateBooking(req.body, id);
             return response(res, 200, data);
         } catch (error) {
             return response(res, 500, error.message);

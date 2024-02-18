@@ -23,9 +23,8 @@ const controller = {
     },
     updateSchedule : async (req, res) => {
         try {
-            const {location} = req.body;
             const id = req.params.id;
-            const data = await model.updateSchedule(location, id);
+            const data = await model.updateSchedule(req.body, id);
             return response(res, 200, data);
         } catch (error) {
             return response(res, 500, error.message);

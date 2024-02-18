@@ -25,10 +25,20 @@ const model = {
             });
         });
     },
-    updateBooking : (payment_method, id) => {
+    updateBooking : ({schedule_id, user_id, seat, total_ticket, total_payment, payment_method}, id) => {
         return new Promise((resolve, reject) => {
             console.log(id);
-            db.query(`update booking set payment_method = coalesce($1, payment_method), updated_at = now() where id = $2`, [payment_method, id] )
+            db.query(
+                `update booking set
+                    schedule_id = COALESCE(NULLIF($1, ''), schedule_id), 
+                    user_id = COALESCE(NULLIF($2, ''), user_id), 
+                    seat = COALESCE(NULLIF($3, ''), seat), 
+                    total_ticket = COALESCE(NULLIF($4, ''), total_ticket), 
+                    total_payment = COALESCE(NULLIF($5, ''), total_payment), 
+                    payment_method = coalesce($6, payment_method),
+                    updated_at = now() 
+                where id = $7`, 
+                [schedule_id, user_id, seat, total_ticket, total_payment, payment_method, id] )
             .then((res)=>{
                 resolve(`${res.rowCount} data updated`);
             }).catch((err)=>{
