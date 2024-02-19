@@ -28,16 +28,20 @@ const model = {
     updateSchedule : ({movie_id, location, price, start_date, end_date, time}, id) => {
         return new Promise((resolve, reject) => {
             console.log(id);
+            // coalesce = mengambil data pertama yang bukan null
+            // null if = merubah value menjadi null jika data yang dibandingkan sama
+            console.log(movie_id);
+            console.log(price);
             db.query(
                 `update schedule set 
-                    movie_id = COALESCE(NULLIF($1, ''), movie_id), 
+                    movie_id = COALESCE($1, movie_id), 
                     location = COALESCE(NULLIF($2, ''), location), 
-                    price = COALESCE(NULLIF($3, ''), price), 
-                    start_date = COALESCE(NULLIF($4, ''), start_date), 
-                    end_date = COALESCE(NULLIF($5, ''), end_date), 
+                    price = COALESCE($3, price), 
+                    start_date = COALESCE($4, start_date), 
+                    end_date = COALESCE($5, end_date), 
                     time = coalesce($6, time),
                     updated_at = now() 
-                    where id = $2`, [movie_id, location, price, start_date, end_date, time, id] )
+                    where id = $7`, [movie_id, location, price, start_date, end_date, time, id] )
             .then((res)=>{
                 resolve(`${res.rowCount} data updated`);
             }).catch((err)=>{

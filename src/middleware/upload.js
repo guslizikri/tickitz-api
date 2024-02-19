@@ -25,8 +25,8 @@ const middleware = {
             if (exactExt) {
               return cb(null, true);
             } 
-            const error = new Error("invalid file extention. Only PNG, JPG, and JPEG files are allowed");
-            return cb(error, false);
+            const error = new Error();
+            return cb("invalid file extention. Only PNG, JPG, and JPEG files are allowed", false);
         };
         const upload = multer({ 
           storage: storage, 

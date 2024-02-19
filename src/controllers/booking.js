@@ -4,7 +4,15 @@ const response = require('../utils/response');
 const controller = {
     getBooking : async (req, res) => {
         try {
-            const data = await model.getBooking();
+            const data = await model.getBooking(req.decodeToken.id);
+            return response(res, 200, data);
+        } catch (error) {
+            return response(res, 500, error.message);
+        }
+    },
+    getDetailBooking : async (req, res) => {
+        try {
+            const data = await model.getDetailBooking(req.params.id);
             return response(res, 200, data);
         } catch (error) {
             return response(res, 500, error.message);

@@ -24,10 +24,21 @@ const controller = {
     updateSchedule : async (req, res) => {
         try {
             const id = req.params.id;
-            const data = await model.updateSchedule(req.body, id);
+            // merubah data body karena jika form tidak diisi maka menghasilkan string kosong,
+            // dan tidak bisa ditangani oleh query null if (tipe data kolom salain string),
+            const body = {
+                location : req.body.location,
+                price : req.body.price? req.body.price : null,
+                movie_id : req.body.movie_id? Number(req.body.movie_id) : null,
+                time : req.body.time? req.body.time : null,
+                start_date : req.body.start_date? req.body.start_date : null,
+                end_date : req.body.end_date? req.body.end_date : null,
+            };
+            console.log(body);
+            const data = await model.updateSchedule(body, id);
             return response(res, 200, data);
         } catch (error) {
-            return response(res, 500, error.message);
+            return response(res, 500, error);
         }
     },
     deleteSchedule : async (req, res) => {

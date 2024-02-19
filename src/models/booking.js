@@ -1,8 +1,31 @@
 const db = require('../config/db');
 const model = {
-    getBooking : () => {
+    getBooking : (idUser) => {
         return new Promise((resolve, reject) => {
-            db.query('select * from booking limit 5')
+            db.query(
+                `select b.id, m.title, s.location, s.cinema, s.start_date, s.time from schedule as s  
+                join booking as b on s.id = b.schedule_id
+                join movie as m on m.id = s.movie_id
+                where b.user_id = $1 limit 5`, [idUser]
+            )
+            .then((res)=>{
+                let result = res.rows;
+                if (result <= 0) {
+                    result = "Data not found";
+                }
+                resolve(result);
+            }).catch((err)=>{
+                reject(err);
+            });
+        });
+    },
+    getDetailBooking : (id) => {
+        return new Promise((resolve, reject) => {
+            db.query(
+                `select m.title, s.location, s.cinema, s.start_date, s.time, b.payment_method, b.total_payment from schedule as s  
+                join booking as b on s.id = b.schedule_id
+                join movie as m on m.id = s.movie_id
+                where b.id = $1 limit 5`, [id])
             .then((res)=>{
                 let result = res.rows;
                 if (result <= 0) {

@@ -6,6 +6,7 @@ const controller = {
     getMovie : async (req, res) => {
         try {
             const {title, release_date} = req.query;
+            console.log(req.decodeToken.id);
             // get movie by name and release dat
             if (title && release_date) {
                 const data = await model.getMovieByNameAndDate(title, release_date);
@@ -54,7 +55,18 @@ const controller = {
                 const path = `./public/upload/movie/${imgName}`;
                 fs.unlinkSync(path);
             }
-            const data = await model.updateMovie(req.body, id);
+            // merubah data body karena jika form tidak diisi maka menghasilkan string kosong,
+            // dan tidak bisa ditangani oleh query null if (tipe data kolom salain string),
+            const body = {
+                title : req.body.title,
+                director : req.body.director,
+                casts : req.body.casts,
+                synopsis : req.body.synopsis,
+                img : req.body.img,
+                duration : req.body.duration? req.body.duration : null,
+                release_date : req.body.release_date? req.body.release_date : null,
+            };
+            const data = await model.updateMovie(body, id);
             return response(res, 200, data);
         } catch (error) {
             return response(res, 500, error.message);
@@ -79,7 +91,24 @@ const controller = {
         } catch (error) {
             return response(res, 500, error.message);
         }
+    },
+    fetchBy : async (req, res) => {
+        try {
+            const params = {
+                page: req.query.page || 1,
+                limit: req.query.limit || 5,
+                orderBy: req.query.orderBy || 'created_at',
+                search: req.query.search
+            };
+            const result = await model.getBy(params);
+            return respone(res, 200, result);
+        } catch (error) {
+            console.log(error);
+            return respone(res, 500, error.message);
+        }
     }
+    
+    
 };
 
 module.exports = controller;
