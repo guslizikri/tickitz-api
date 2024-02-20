@@ -19,13 +19,13 @@ const model = {
             });
         });
     },
-    getDetailBooking : (id) => {
+    getDetailBooking : (id, id_user) => {
         return new Promise((resolve, reject) => {
             db.query(
                 `select m.title, s.location, s.cinema, s.start_date, s.time, b.payment_method, b.total_payment from schedule as s  
                 join booking as b on s.id = b.schedule_id
                 join movie as m on m.id = s.movie_id
-                where b.id = $1 limit 5`, [id])
+                where b.id = $1 and b.user_id = $2 limit 5`, [id, id_user])
             .then((res)=>{
                 let result = res.rows;
                 if (result <= 0) {

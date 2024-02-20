@@ -4,6 +4,7 @@ const response = require('../utils/response');
 const controller = {
     getBooking : async (req, res) => {
         try {
+            // decodeToken ngambil dari auth 
             const data = await model.getBooking(req.decodeToken.id);
             return response(res, 200, data);
         } catch (error) {
@@ -12,7 +13,7 @@ const controller = {
     },
     getDetailBooking : async (req, res) => {
         try {
-            const data = await model.getDetailBooking(req.params.id);
+            const data = await model.getDetailBooking(req.params.id, req.decodeToken.id);
             return response(res, 200, data);
         } catch (error) {
             return response(res, 500, error.message);
@@ -20,9 +21,9 @@ const controller = {
     },
     addBooking : async (req, res) => {
         try {
-            const {schedule_id, user_id, seat, total_ticket, total_payment, payment_method} = req.body;
+            const {schedule_id, seat, total_ticket, total_payment, payment_method} = req.body;
             console.log(req.body);
-            const data = await model.addBooking(schedule_id, user_id, seat, total_ticket, total_payment, payment_method);
+            const data = await model.addBooking(schedule_id, req.decodeToken.id, seat, total_ticket, total_payment, payment_method);
             return response(res, 201, data);
         } catch (error) {
             return response(res, 500, error.message);

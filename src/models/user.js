@@ -44,7 +44,24 @@ const model = {
                 });
         });
     },
-    // Cek data apakah ada atau tidak didalam table user
+    // Cek data apakah ada atau tidak didalam table user with id user
+    // Sekarang hanya mengambil id dan img (jika membutuhkan colom lain tambahkan saja)
+    getUserById : (id) => {
+        return new Promise((resolve, reject) => {
+            db.query('SELECT id, img FROM users WHERE id = $1', [id])
+                .then((res) => {
+                    let result = res.rows;
+                    if (result <= 0) {
+                        result = false;
+                    }
+                    resolve(result);
+                })
+                .catch((error) => {
+                    reject(error);
+                });
+        });
+    },
+    // Cek data apakah ada atau tidak didalam table user with username
     dataExists : (username) => {
         return new Promise((resolve, reject) => {
             db.query('SELECT id FROM users WHERE username = $1', [username])
@@ -82,12 +99,24 @@ const model = {
     
     // update user 
 
+    updateImageUser : (img, id_user) => {
+        return new Promise((resolve, reject) => {
+            db.query(
+                `UPDATE users SET
+                    img = $1,
+                    updated_at = now()
+                WHERE id = $2`,
+                [img, id_user]
+            )
+                .then((res) => {
+                    resolve(`${res.rowCount} user updated`);
+                })
+                .catch((error) => {
+                    reject(error);
+                });
+        });
+    },
     updateUser : ({ username, password, email, role}, id) => {
-        console.log(username);
-        console.log(password);
-        console.log(email);
-        console.log(role);
-        console.log(id);
         return new Promise((resolve, reject) => {
             db.query(
                 `UPDATE users SET

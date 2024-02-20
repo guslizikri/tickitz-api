@@ -43,17 +43,10 @@ const controller = {
     updateMovie : async (req, res) => {
         try {
             const id = req.params.id;
+            req.body.img = await req.file? `http://localhost:3001/movie/image/${req.file.filename}` : "";
             const dataExist = await model.getMovieById(id);
             if (dataExist === false) {
                 return response(res, 404, "Data not found");
-            }
-            
-            console.log(req.file);
-            req.body.img = await req.file? `http://localhost:3001/movie/image/${req.file.filename}` : "";
-            if (req.body.img) {
-                const imgName = dataExist[0].img.replace("http://localhost:3001/movie/image/", "");
-                const path = `./public/upload/movie/${imgName}`;
-                fs.unlinkSync(path);
             }
             // merubah data body karena jika form tidak diisi maka menghasilkan string kosong,
             // dan tidak bisa ditangani oleh query null if (tipe data kolom salain string),
@@ -67,6 +60,15 @@ const controller = {
                 release_date : req.body.release_date? req.body.release_date : null,
             };
             const data = await model.updateMovie(body, id);
+            console.log(req.file);
+            // cek apakah update mengirim file?
+            if (req.body.img) {
+                // proses menghapus file sebelumnya
+                const imgName = dataExist[0].img.replace("http://localhost:3001/user/image/", "");
+                const path = `./public/upload/movie/${imgName}`;
+                fs.unlinkSync(path);
+            }
+            
             return response(res, 200, data);
         } catch (error) {
             return response(res, 500, error.message);
@@ -81,12 +83,13 @@ const controller = {
             if (dataExist === false) {
                 return response(res, 404, "Data not found");
             }
+            const data = await model.deleteMovie(id);
+
             const imgName = dataExist[0].img.replace("http://localhost:3001/movie/image/", "");
             const path = `./public/upload/movie/${imgName}`;
             fs.unlinkSync(path, (error) => {
                 throw error;
             });
-            const data = await model.deleteMovie(id);
             return response(res, 200, dataExist);
         } catch (error) {
             return response(res, 500, error.message);
