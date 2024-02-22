@@ -64,7 +64,7 @@ const controller = {
             // cek apakah update mengirim file?
             if (req.body.img) {
                 // proses menghapus file sebelumnya
-                const imgName = dataExist[0].img.replace("http://localhost:3001/user/image/", "");
+                const imgName = dataExist[0].img.replace("http://localhost:3001/movie/image/", "");
                 const path = `./public/upload/movie/${imgName}`;
                 fs.unlinkSync(path);
             }
