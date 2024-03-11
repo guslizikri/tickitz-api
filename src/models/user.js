@@ -28,6 +28,7 @@ const model = {
                 });
         });
     },
+    
     // mengambil data user untuk kebutuhan login berdasarkan username
     getPassByUsername : (username) => {
         return new Promise((resolve, reject) => {
@@ -77,6 +78,21 @@ const model = {
                 });
         });
     },
+    dataExistsEmail : (email) => {
+        return new Promise((resolve, reject) => {
+            db.query('SELECT id FROM users WHERE email = $1', [email])
+                .then((res) => {
+                    if (res.rows.length) {
+                        resolve(true);
+                    } else {
+                        resolve(false);
+                    }
+                })
+                .catch((error) => {
+                    reject(error);
+                });
+        });
+    },
     
     // menambahkan user untuk kebutuhan register
     addUser : ({ username, password, email }) => {
@@ -89,7 +105,7 @@ const model = {
                 [username, email, password]
             )
                 .then((res) => {
-                    resolve(`${res.rowCount} user created`);
+                    resolve(`Sign-up completed`);
                 })
                 .catch((error) => {
                     reject(error);

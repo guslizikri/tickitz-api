@@ -6,7 +6,6 @@ const controller = {
     getMovie : async (req, res) => {
         try {
             const {title, release_date} = req.query;
-            console.log(req.decodeToken.id);
             // get movie by name and release dat
             if (title && release_date) {
                 const data = await model.getMovieByNameAndDate(title, release_date);
@@ -23,6 +22,14 @@ const controller = {
             }
             
             // res.send(data)
+        } catch (error) {
+            return response(res, 500, error.message);
+        }
+    },
+    getDetailMovie : async (req, res) => {
+        try {
+            const data = await model.getDetailMovie(req.params.id);
+            return response(res, 200, data);
         } catch (error) {
             return response(res, 500, error.message);
         }
@@ -63,10 +70,14 @@ const controller = {
             console.log(req.file);
             // cek apakah update mengirim file?
             if (req.body.img) {
-                // proses menghapus file sebelumnya
+                // cek apakah file sebelummnya ada dalam local storage atau tidak
                 const imgName = dataExist[0].img.replace("http://localhost:3001/movie/image/", "");
                 const path = `./public/upload/movie/${imgName}`;
+                if (fs.existsSync(path)) {
+                    // proses menghapus file sebelumnya
+               
                 fs.unlinkSync(path);
+                }
             }
             
             return response(res, 200, data);
@@ -100,14 +111,14 @@ const controller = {
             const params = {
                 page: req.query.page || 1,
                 limit: req.query.limit || 5,
-                orderBy: req.query.orderBy || 'created_at',
+                orderBy: req.query.orderBy || 'updated_at',
                 search: req.query.search
             };
             const result = await model.getBy(params);
-            return respone(res, 200, result);
+            return response(res, 200, result);
         } catch (error) {
             console.log(error);
-            return respone(res, 500, error.message);
+            return response(res, 500, error.message);
         }
     }
     

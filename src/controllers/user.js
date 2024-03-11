@@ -17,6 +17,14 @@ const controller = {
     addUser : async (req, res) => {
         try {
             req.body.password = await hashing(req.body.password);
+            const cekEmail = await model.dataExistsEmail(req.body.email);
+            const cekUsername = await model.dataExists(req.body.username);
+            if (cekEmail) {
+                return response(res, 401, "Email already exists");
+            }
+            if (cekUsername) {
+                return response(res, 401, "Username already exists");
+            }
             console.log(req.body);
             const result = await model.addUser(req.body);
             return response(res, 201, result);

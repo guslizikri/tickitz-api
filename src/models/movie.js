@@ -1,4 +1,6 @@
 const db = require('../config/db');
+const escape = require('pg-format');
+const moment = require('moment');
 const model = {
     getMovie : () => {
         return new Promise((resolve, reject) => {
@@ -29,13 +31,23 @@ const model = {
             });
         });
     },
-    getMovieById : (id) => {
+
+    // get movie by id
+    getDetailMovie : (id) => {
         return new Promise((resolve, reject) => {
-            db.query(`select * from movie where id = $1`, [id])
+            db.query(` 
+            SELECT 
+            m.*,
+            string_agg(g.genre, ', ') AS genre
+        FROM public.movie m
+        left JOIN public.movie_genre mg ON mg.movie_id = m.id
+        left JOIN public.genre g ON mg.genre_id = g.id
+        WHERE m.id = $1
+        GROUP BY m.id`, [id])
             .then((res)=>{
                 let result = res.rows;
                 if (result <= 0) {
-                    result = false;
+                    result = "Data not found";
                 }
                 resolve(result);
             }).catch((err)=>{
@@ -130,7 +142,66 @@ const model = {
             await pg.query('ROLLBACK');
             throw error;
         }
+    },
+    getBy : async ({ page, limit, orderBy, search }) => {
+        try {
+            let filterQuery = '';
+            let orderQuery = '';
+            let metaQuery = '';
+            let count = 0;
+    
+    
+            if (search) {
+                filterQuery += search ? escape('AND movie_name = %L', search) : '';
+            }
+    
+            if (orderBy) {
+                orderQuery += escape('ORDER BY %s', orderBy);
+            }
+    
+            if (page && limit) {
+                const offset = (page - 1) * limit;
+                metaQuery += escape('LIMIT %s OFFSET %s', limit, offset);
+            }
+    
+            db.query(
+                `SELECT COUNT(m.id) as "count" FROM public.movie m WHERE true ${filterQuery}`
+            ).then((v) => {
+                count = v.rows[0].count;
+            });
+    
+            const data = await db.query(`
+                SELECT 
+                    m.*,
+                    string_agg(g.genre, ', ') AS genre
+                FROM public.movie m
+                left JOIN public.movie_genre mg ON mg.movie_id = m.id
+                left JOIN public.genre g ON mg.genre_id = g.id
+                WHERE true ${filterQuery}
+                GROUP BY m.id
+                ${orderQuery} ${metaQuery}
+            `);
+    
+            const meta = {
+                next: count <= 0 ? null : page == Math.ceil(count / limit) ? null : Number(page) + 1,
+                prev: page == 1 ? null : Number(page) - 1,
+                total: count
+            };
+    
+            if (data.rows <= 0) {
+                return 'data not found';
+            } else {
+                data.rows.map((v) => {
+                    const date = moment(v.release_date);
+                    v.release_date = date.format('DD MMMM YYYY');
+                });
+                return { data: data.rows, meta };
+            }
+        } catch (error) {
+            throw error;
+        }
     }
+    
     
 };
 
