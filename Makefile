@@ -3,8 +3,7 @@ BUILD="./build/$(APP)"
 DB_DRIVER=postgres
 DB_SOURCE="postgresql://admin:admin@localhost/coffeeshop?sslmode=disable&search_path=public"
 MIGRATIONS_CONFIG=database.js
-# https://github.com/golang-migrate/migrate/tree/master/cmd/migrate
-
+# https://www.kindsonthegenius.com/db-migrate-simplified-how-to-generate-posgresql-database-from-node-js/
 
 install:
 	npm install
