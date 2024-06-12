@@ -6,11 +6,20 @@ const uploadMiddleware = require('../middleware/upload.js');
 
 
 // routers.get("/",  movieController.getMovie);
+// routers.post("/",  authMiddleware.authentication, authMiddleware.isAdmin, uploadMiddleware.uploadMovie, movieController.addMovie);
+
 routers.get("/",  movieController.fetchBy);
 routers.get("/:id",  movieController.getDetailMovie);
-routers.post("/",  authMiddleware.authentication, authMiddleware.isAdmin, uploadMiddleware.uploadMovie, movieController.addMovie);
-routers.patch("/:id",authMiddleware.authentication, uploadMiddleware.uploadMovie, movieController.updateMovie);
-routers.delete("/:id", authMiddleware.authentication,  movieController.deleteMovie);
+routers.post("/",  authMiddleware.authentication, authMiddleware.isAdmin, uploadMiddleware.uploadMovie, movieController.save);
+routers.patch("/:id",authMiddleware.authentication, authMiddleware.isAdmin, uploadMiddleware.uploadMovie, movieController.updateMovie);
+routers.delete("/:id", authMiddleware.authentication, authMiddleware.isAdmin, movieController.deleteMovie);
+
+// routers.get("/",  movieController.fetchBy);
+// routers.get("/:id",  movieController.getDetailMovie);
+// routers.post("/", uploadMiddleware.uploadMovie, movieController.save);
+// routers.patch("/:id", uploadMiddleware.uploadMovie, movieController.updateMovie);
+// routers.delete("/:id",   movieController.deleteMovie);
+
 routers.use("/image", express.static("./public/upload/movie"));
 
 module.exports = routers;
