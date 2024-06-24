@@ -1,20 +1,19 @@
-FROM node:20.14.0-alpine AS build
+FROM cgr.dev/chainguard/node:latest-dev AS build
+RUN mkdir -p /app
+WORKDIR /app
+COPY . /app
+USER root
+RUN rm -rf node_modules && npm install
 
-# 
-WORKDIR /nodeapp
+FROM cgr.dev/chainguard/node:latest
+COPY --from=build /app /usr/src/app
+WORKDIR /usr/src/app
+# sesuakan dengan port yang dipakai
+EXPOSE 3001 
+# sesuaikan dngan nama entry pointnya
+# ini langsung menargetkan entrypointnya langsung, 
+# karena jika menggunakan npm start akan lebih berat
+CMD ["app.js"]
 
-# Menyalin package.json dan package-lock.json ke dalam container
-COPY package*.json ./
-
-# download depedency
-RUN npm install
-
-# menyalin semua file
-COPY . .
-
-CMD ["npm", "start"]
-EXPOSE 3001
-# contoh build image
 # docker build -t zikrigusli/tickitzapi:1 .
-
 # -t adalah tag
